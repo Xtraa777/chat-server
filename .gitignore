@@ -1,11 +1,26 @@
-HELP.md
+# ========================================
+# Gradle
+# ========================================
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### STS ###
+# ========================================
+# IntelliJ IDEA
+# ========================================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# ========================================
+# Eclipse / STS
+# ========================================
 .apt_generated
 .classpath
 .factorypath
@@ -17,21 +32,94 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
+# ========================================
+# VS Code
+# ========================================
+.vscode/
 
-### NetBeans ###
+# ========================================
+# NetBeans
+# ========================================
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
-.vscode/
+# ========================================
+# 민감 정보 (중요!)
+# ========================================
+# 환경 변수 파일
+.env
+.env.local
+.env.*.local
+application-local.yml
+application-secret.yml
+
+# DB 설정 백업
+*-secret.properties
+*-secret.yml
+
+# 인증서 및 키
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+*.crt
+
+# ========================================
+# 로그 파일
+# ========================================
+logs/
+*.log
+log/
+*.log.*
+
+# ========================================
+# OS 임시 파일
+# ========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+
+# ========================================
+# 테스트 결과
+# ========================================
+test-results/
+coverage/
+*.exec
+*.class
+
+# ========================================
+# Docker
+# ========================================
+docker-compose.override.yml
+.dockerignore
+
+# ========================================
+# 임시 파일
+# ========================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~.nib
+*.bak
+
+# ========================================
+# 기타
+# ========================================
+HELP.md
+TODO.md
