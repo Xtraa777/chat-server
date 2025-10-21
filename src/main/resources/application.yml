@@ -2,9 +2,10 @@ spring:
   application:
     name: chat-server
 
+  profiles:
+    active: local
+
   datasource:
-    profiles:
-      active: local
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
