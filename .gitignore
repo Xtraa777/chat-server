@@ -123,3 +123,4 @@ docker-compose.override.yml
 # ========================================
 HELP.md
 TODO.md
+application-local.yml
