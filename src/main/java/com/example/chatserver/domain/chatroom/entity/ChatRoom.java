@@ -3,6 +3,7 @@ package com.example.chatserver.domain.chatroom.entity;
 import com.example.chatserver.domain.message.entity.Message;
 import com.example.chatserver.domain.participant.entity.Participant;
 import com.example.chatserver.domain.user.entity.User;
+import com.example.chatserver.global.common.BaseEntity;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class ChatRoom {
+public class ChatRoom extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
