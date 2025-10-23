@@ -31,11 +31,16 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "created_by")
     private User creator;
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Participant> participants = new ArrayList<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Message> messages = new ArrayList<>();
+
+    public void addParticipant(Participant participant) {
+        this.participants.add(participant);
+        participant.setChatRoom(this);
+    }
 }
