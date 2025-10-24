@@ -3,6 +3,7 @@ package com.example.chatserver.domain.chatroom.entity;
 import com.example.chatserver.domain.message.entity.Message;
 import com.example.chatserver.domain.participant.entity.Participant;
 import com.example.chatserver.domain.user.entity.User;
+import com.example.chatserver.global.common.BaseEntity;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class ChatRoom {
+public class ChatRoom extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,11 +31,16 @@ public class ChatRoom {
     @JoinColumn(name = "created_by")
     private User creator;
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Participant> participants = new ArrayList<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Message> messages = new ArrayList<>();
+
+    public void addParticipant(Participant participant) {
+        this.participants.add(participant);
+        participant.setChatRoom(this);
+    }
 }
