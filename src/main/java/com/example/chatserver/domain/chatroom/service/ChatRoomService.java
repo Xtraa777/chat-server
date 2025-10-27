@@ -8,7 +8,8 @@ import com.example.chatserver.domain.participant.entity.Participant;
 import com.example.chatserver.domain.participant.repository.ParticipantRepository;
 import com.example.chatserver.domain.user.entity.User;
 import com.example.chatserver.domain.user.repository.UserRepository;
-import com.example.chatserver.global.exception.NotFoundException;
+import com.example.chatserver.global.exception.BusinessException;
+import com.example.chatserver.global.exception.ErrorCode;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class ChatRoomService {
     public ChatRoomDto.Response createChatRoom(ChatRoomDto.Request chatRoomReqDto) {
         User creator = userRepository.findById(chatRoomReqDto.getCreatorId())
             .orElseThrow(
-                () -> new NotFoundException("사용자를 찾을 수 없습니다: " + chatRoomReqDto.getCreatorId()));
+                () -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         ChatRoom chatRoom = ChatRoom.builder()
             .name(chatRoomReqDto.getName())
@@ -55,7 +56,7 @@ public class ChatRoomService {
 
     public ChatRoomDto.Response getChatRoom(Long id) {
         ChatRoom chatRoom = chatRoomRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException("채팅방을 찾을 수 없습니다: " + id));
+            .orElseThrow(() -> new BusinessException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 
         return ChatRoomDto.Response.from(chatRoom);
     }
@@ -69,10 +70,10 @@ public class ChatRoomService {
     @Transactional
     public void joinChatRoom(Long roomId, Long userId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-            .orElseThrow(() -> new NotFoundException("채팅방을 찾을 수 없습니다: " + roomId));
+            .orElseThrow(() -> new BusinessException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다: " + userId));
+            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         if (participantRepository.existsByUserIdAndChatRoomId(userId, roomId)) {
             log.info("사용자가 이미 참여 중입니다: roomId={}, userId={}", roomId, userId);
@@ -94,7 +95,7 @@ public class ChatRoomService {
     @Transactional
     public void leaveChatRoom(Long roomId, Long userId) {
         if (!participantRepository.existsByUserIdAndChatRoomId(userId, roomId)) {
-            throw new NotFoundException("참여하지 않은 채팅방입니다");
+            throw new BusinessException(ErrorCode.NOT_A_PARTICIPANT);
         }
 
         participantRepository.deleteByUserIdAndChatRoomId(userId, roomId);

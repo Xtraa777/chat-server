@@ -4,8 +4,8 @@ import com.example.chatserver.domain.user.dto.UserDto;
 import com.example.chatserver.domain.user.dto.UserDto.Response;
 import com.example.chatserver.domain.user.entity.User;
 import com.example.chatserver.domain.user.repository.UserRepository;
-import com.example.chatserver.global.exception.DuplicateException;
-import com.example.chatserver.global.exception.NotFoundException;
+import com.example.chatserver.global.exception.BusinessException;
+import com.example.chatserver.global.exception.ErrorCode;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +25,10 @@ public class UserService {
     public UserDto.Response createUser(UserDto.Request userReqDto) {
 
         if (userRepository.existsByUsername(userReqDto.getUsername())) {
-            throw new DuplicateException("이미 존재하는 사용자명입니다: " + userReqDto.getUsername());
+            throw new BusinessException(ErrorCode.DUPLICATE_USERNAME);
         }
         if (userRepository.existsByEmail(userReqDto.getEmail())) {
-            throw new DuplicateException("이미 존재하는 이메일입니다: " + userReqDto.getEmail());
+            throw new BusinessException(ErrorCode.DUPLICATE_EMAIL);
         }
 
         User user = userReqDto.toEntity();
@@ -41,7 +41,7 @@ public class UserService {
 
     public UserDto.Response getUserById(Long id) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다: " + id));
+            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         return UserDto.Response.from(user);
     }
