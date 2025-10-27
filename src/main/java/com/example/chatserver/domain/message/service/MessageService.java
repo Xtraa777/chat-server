@@ -90,7 +90,7 @@ public class MessageService {
         Message message = Message.builder()
             .chatRoom(chatRoom)
             .sender(user)
-            .content(user.getUsername() + "님이 입장하셨습니다.")
+            .content(user.getUsername() + "님이 퇴장하셨습니다.")
             .type(MessageType.LEAVE)
             .build();
 
