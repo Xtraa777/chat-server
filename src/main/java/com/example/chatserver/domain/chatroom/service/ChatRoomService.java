@@ -8,7 +8,6 @@ import com.example.chatserver.domain.participant.entity.Participant;
 import com.example.chatserver.domain.participant.repository.ParticipantRepository;
 import com.example.chatserver.domain.user.entity.User;
 import com.example.chatserver.domain.user.repository.UserRepository;
-import com.example.chatserver.global.exception.DuplicateException;
 import com.example.chatserver.global.exception.NotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,7 +75,8 @@ public class ChatRoomService {
             .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
         if (participantRepository.existsByUserIdAndChatRoomId(userId, roomId)) {
-            throw new DuplicateException("이미 참여 중인 채팅방입니다");
+            log.info("사용자가 이미 참여 중입니다: roomId={}, userId={}", roomId, userId);
+            return;
         }
 
         Participant participant = Participant.builder()
