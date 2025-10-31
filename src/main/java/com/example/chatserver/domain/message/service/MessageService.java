@@ -102,7 +102,7 @@ public class MessageService {
 
     public List<MessageDto.Response> getRecentMessages(Long roomId, int limit) {
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Direction.DESC, "id"));
-        List<Message> messages = messageRepository.findByChatRoomId(roomId, pageable);
+        List<Message> messages = messageRepository.findByChatRoomIdWithSender(roomId, pageable);
 
         List<MessageDto.Response> responses = messages.stream()
             .map(MessageDto.Response::from)
@@ -115,7 +115,7 @@ public class MessageService {
 
     public List<MessageDto.Response> getPastMessages(Long roomId, Long lastMessageId, int limit) {
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "id"));
-        List<Message> messages = messageRepository.findByChatRoomIdAndIdLessThan(roomId,
+        List<Message> messages = messageRepository.findPastMessagesWithSender(roomId,
             lastMessageId, pageable);
 
         List<MessageDto.Response> responses = messages.stream()

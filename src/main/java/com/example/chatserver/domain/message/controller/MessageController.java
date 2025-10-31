@@ -17,7 +17,7 @@ public class MessageController {
     @GetMapping
     public ResponseEntity<List<MessageDto.Response>> getRecentMessages(
         @PathVariable Long roomId,
-        @RequestParam(defaultValue = "50") int limit) {
+        @RequestParam(defaultValue = "100") int limit) {
         List<MessageDto.Response> messages = messageService.getRecentMessages(roomId, limit);
 
         return ResponseEntity.ok(messages);
@@ -27,7 +27,7 @@ public class MessageController {
     public ResponseEntity<List<MessageDto.Response>> getPastMessages(
             @PathVariable Long roomId,
             @RequestParam Long lastMessageId,
-            @RequestParam(defaultValue = "50") int limit) {
+            @RequestParam(defaultValue = "100") int limit) {
         List<MessageDto.Response> messages = messageService.getPastMessages(roomId, lastMessageId, limit);
         return ResponseEntity.ok(messages);
     }
