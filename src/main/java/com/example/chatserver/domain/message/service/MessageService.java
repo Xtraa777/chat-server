@@ -12,11 +12,13 @@ import com.example.chatserver.global.exception.BusinessException;
 import com.example.chatserver.global.exception.ErrorCode;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -125,5 +127,33 @@ public class MessageService {
         Collections.reverse(responses);
 
         return responses;
+    }
+
+    @Async("messageTaskExecutor")
+    @Transactional
+    public CompletableFuture<MessageDto.Response> saveMessageAsync(
+        MessageDto.Request messageReqDto) {
+        log.info("[ASYNC] DB에 메시지 저장 중 - 스레드: {}",
+            Thread.currentThread().getName());
+
+        ChatRoom chatRoom = chatRoomRepository.findById(messageReqDto.getRoomId())
+            .orElseThrow(() -> new BusinessException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+
+        User sender = userRepository.findById(messageReqDto.getSenderId())
+            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        Message message = Message.builder()
+            .chatRoom(chatRoom)
+            .sender(sender)
+            .content(messageReqDto.getContent())
+            .type(messageReqDto.getType() != null ? messageReqDto.getType() : MessageType.CHAT)
+            .build();
+
+        Message savedMessage = messageRepository.save(message);
+
+        log.info("[ASYNC] DB에 메시지 저장 완료: id={}, 스레드={}",
+            savedMessage.getId(), Thread.currentThread().getName());
+
+        return CompletableFuture.completedFuture(MessageDto.Response.from(savedMessage));
     }
 }

@@ -18,40 +18,51 @@ public class ChatController {
 
     @MessageMapping("/chat.send")
     public void sendMessage(MessageDto.Request messageReqDto) {
-        log.info("Message received: roomId={}, senderId={}, content={}",
+        log.info("메시지 수신: roomId={}, senderId={}, content={}",
             messageReqDto.getRoomId(), messageReqDto.getSenderId(), messageReqDto.getContent());
 
-        MessageDto.Response savedMessage = messageService.saveMessage(messageReqDto);
+        MessageDto.Response tempResponse = MessageDto.Response.fromRequest(messageReqDto);
 
+        long broadcastStart = System.currentTimeMillis();
         simpMessagingTemplate.convertAndSend(
-            "/topic/room." + messageReqDto.getRoomId(), savedMessage);
+            "/topic/room." + messageReqDto.getRoomId(), tempResponse);
+        long broadcastEnd = System.currentTimeMillis();
 
-        log.info("Message broadcasted: messageId={}", savedMessage.id());
+        log.info("메시지 브로드캐스트 완료 {}ms - messageId: temp",
+            (broadcastEnd - broadcastStart));
+
+        messageService.saveMessageAsync(messageReqDto)
+            .thenAccept(savedMessage ->
+                log.info("메시지 저장: id={}", savedMessage.id()))
+            .exceptionally(ex -> {
+                log.error("메시지 저장 실패: {}", ex.getMessage(), ex);
+                return null;
+            });
     }
 
     @MessageMapping("/chat.join")
     public void joinMessage(MessageDto.Request messageReqDto) {
-        log.info("Message received: roomId={}, senderId={}, content={}",
+        log.info("입장 메시지 수신: roomId={}, senderId={}, content={}",
             messageReqDto.getRoomId(), messageReqDto.getSenderId(), messageReqDto.getContent());
 
-        MessageDto.Response joinMessage = messageService.joinMessage(messageReqDto);
-
+        MessageDto.Response tempResponse = MessageDto.Response.fromRequest(messageReqDto);
         simpMessagingTemplate.convertAndSend(
-            "/topic/room." + messageReqDto.getRoomId(), joinMessage);
+            "/topic/room." + messageReqDto.getRoomId(), tempResponse);
 
-        log.info("Message broadcasted: messageId={}", joinMessage.id());
+        messageService.saveMessageAsync(messageReqDto)
+            .thenAccept(savedMessage -> log.info("입장 메시지 저장:id={}", savedMessage.id()));
     }
 
     @MessageMapping("/chat.leave")
     public void leaveMessage(MessageDto.Request messageReqDto) {
-        log.info("Message received: roomId={}, senderId={}, content={}",
+        log.info("퇴장 메시지 수신: roomId={}, senderId={}, content={}",
             messageReqDto.getRoomId(), messageReqDto.getSenderId(), messageReqDto.getContent());
 
-        MessageDto.Response leaveMessage = messageService.leaveMessage(messageReqDto);
-
+        MessageDto.Response tempResponse = MessageDto.Response.fromRequest(messageReqDto);
         simpMessagingTemplate.convertAndSend(
-            "/topic/room." + messageReqDto.getRoomId(), leaveMessage);
+            "/topic/room." + messageReqDto.getRoomId(), tempResponse);
 
-        log.info("Message broadcasted: messageId={}", leaveMessage.id());
+        messageService.saveMessageAsync(messageReqDto)
+            .thenAccept(savedMessage -> log.info("퇴장 메시지 저장: id={}", savedMessage.id()));
     }
 }

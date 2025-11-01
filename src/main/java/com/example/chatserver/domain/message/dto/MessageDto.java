@@ -1,6 +1,7 @@
 package com.example.chatserver.domain.message.dto;
 
 import com.example.chatserver.domain.message.entity.Message;
+import com.example.chatserver.domain.message.entity.Message.MessageType;
 import com.example.chatserver.domain.user.dto.UserSimpleDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -44,6 +45,17 @@ public class MessageDto {
                 message.getContent(),
                 message.getType(),
                 message.getCreatedAt()
+            );
+        }
+
+        public static Response fromRequest(Request request) {
+            return new Response(
+                null,
+                request.getRoomId(),
+                new UserSimpleDto(request.getSenderId(), "Unkonwn"),
+                request.getContent(),
+                request.getType() != null ? request.getType() : MessageType.CHAT,
+                LocalDateTime.now()
             );
         }
     }
